@@ -10,10 +10,11 @@ from arena_util import write_json
 
 
 class ArenaSplitter:
-    def _split_data(self, playlists):
+    def _split_data(self, playlists, train_size):
         tot = len(playlists)
-        train = playlists[:int(tot*0.80)]
-        val = playlists[int(tot*0.80):]
+        split_index = int(tot*train_size)
+        train = playlists[:split_index]
+        val = playlists[split_index:]
 
         return train, val
 
@@ -48,11 +49,11 @@ class ArenaSplitter:
         tags_only = playlists[int(tot * 0.8):int(tot * 0.95)]
         title_only = playlists[int(tot * 0.95):]
 
-        print(f"Total: {len(playlists)}, "
-              f"Song only: {len(song_only)}, "
-              f"Song & Tags: {len(song_and_tags)}, "
-              f"Tags only: {len(tags_only)}, "
-              f"Title only: {len(title_only)}")
+        print(f'Total: {len(playlists)}, '
+              f'Song only: {len(song_only)}, '
+              f'Song & Tags: {len(song_and_tags)}, '
+              f'Tags only: {len(tags_only)}, '
+              f'Title only: {len(title_only)}')
 
         song_q, song_a = self._mask(song_only, ['songs'], ['tags'])
         songtag_q, songtag_a = self._mask(song_and_tags, ['songs', 'tags'], [])
@@ -70,27 +71,29 @@ class ArenaSplitter:
 
         return q, a
 
-    def run(self, fname):
+    def run(self, fname, train_size):
         random.seed(777)
 
-        print("Reading data...\n")
+        print('Reading data...\n')
         playlists = load_json(fname)
         random.shuffle(playlists)
-        print(f"Total playlists: {len(playlists)}")
+        print(f'Total playlists: {len(playlists)}')
 
-        print("Splitting data...")
-        train, val = self._split_data(playlists)
+        print(f'Splitting data... train_size is {train_size}')
+        train, val = self._split_data(
+            playlists, train_size
+        )
 
-        print("Original train...")
-        write_json(train, "orig/train.json")
-        print("Original val...")
-        write_json(val, "orig/val.json")
+        print('Original train...')
+        write_json(train, 'orig/train.json')
+        print('Original val...')
+        write_json(val, 'orig/val.json')
 
-        print("Masked val...")
+        print('Masked val...')
         val_q, val_a = self._mask_data(val)
-        write_json(val_q, "questions/val.json")
-        write_json(val_a, "answers/val.json")
+        write_json(val_q, 'questions/val.json')
+        write_json(val_a, 'answers/val.json')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     fire.Fire(ArenaSplitter)
