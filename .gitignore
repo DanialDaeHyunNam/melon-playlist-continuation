@@ -1,5 +1,8 @@
 res
 arena_data
+local_val
+submit_val
+
 *.swp
 .DS_Store
 __pycache__
