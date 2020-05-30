@@ -20,6 +20,9 @@ def get_absolute_path_of_project_directory():
 
 
 def write_json(data, fname, is_submit=False):
+    if '-' in fname:
+        raise Exception('fname에 "-"는 포함하지 마시오.')
+
     def _conv(o):
         if isinstance(o, (np.int64, np.int32)):
             return int(o)
@@ -40,9 +43,9 @@ def write_json(data, fname, is_submit=False):
 
     if '.json' in fname:
         prefix = fname.split('.')[0]
-        fname = prefix + '_' + now + '.json'
+        fname = prefix + '-' + now + '.json'
     else:
-        fname += '_' + now + '.json'
+        fname += '-' + now + '.json'
 
     parent = os.path.dirname(base_path + fname)
     distutils.dir_util.mkpath(parent)

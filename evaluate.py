@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 import fire
+import datetime
 import numpy as np
 
+from os import listdir
+from os.path import isfile, join
 from arena_util import load_json
+from util import get_absolute_path_of_project_directory
 
 
 class ArenaEvaluator:
@@ -63,7 +67,30 @@ class ArenaEvaluator:
 
         return music_ndcg, tag_ndcg, score
 
-    def evaluate(self, gt_fname, rec_fname):
+    def evaluate(
+        self,
+        gt_fname=None,
+        rec_fname=None,
+    ):
+        if gt_fname is None and rec_fname is None:
+            base_path = get_absolute_path_of_project_directory()
+            base_path += 'local_val/'
+            filenames = [
+                f for f in listdir(base_path) if isfile(join(base_path, f))
+            ]
+            file_saved_times = []
+            for filename in filenames:
+                file_date = filename.split('-')[-1].split('.')[0]
+                strf_time = datetime.datetime.strptime(
+                    file_date, '%m%d_%H%M%S'
+                )
+                file_saved_times.append(strf_time)
+
+            latest_file_index = np.argmax(file_saved_times)
+            rec_fname = base_path + filenames[latest_file_index]
+            gt_fname = 'arena_data/answers/val.json'
+            print(f'predict file using: {rec_fname}')
+
         try:
             music_ndcg, tag_ndcg, score = self._eval(gt_fname, rec_fname)
             print(f'Music nDCG: {music_ndcg:.6}')
