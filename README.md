@@ -1,5 +1,5 @@
 # Melon Playlist Continuation
-[카카오 베이스라인 github](https://github.com/kakao-arena/melon-playlist-continuation)를 사용했음.
+[카카오 베이스라인 github](https://github.com/kakao-arena/melon-playlist-continuation)를 사용함.
 
 ### 폴더 구조 및 split_data 사용법
 ```bash
